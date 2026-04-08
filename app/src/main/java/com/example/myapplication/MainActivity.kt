@@ -50,6 +50,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
@@ -125,15 +127,14 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                OutlinedTextFieldExample()
+                PreferencesApp()
             }
         }
     }
 
     @Composable
-    fun OutlinedTextFieldExample() {
-        var text by remember { mutableStateOf("") }
-        val isError = text.length >= 10
+    fun CheckBoxExample() {
+        var accepted by remember { mutableStateOf(false) }
 
         Column(
             modifier = Modifier
@@ -142,54 +143,88 @@ class  MainActivity : ComponentActivity() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            OutlinedTextField(
-                value = text,
-                onValueChange = {text = it},
-                label = {Text(text = "Nombre")},
-                placeholder = { Text(text = "Escribe tu nombre")},
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Icono Person"
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Checkbox(
+                    checked = accepted,
+                    onCheckedChange = {accepted = it},
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = MaterialTheme.colorScheme.primary,
+                        uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        checkmarkColor = MaterialTheme.colorScheme.onPrimary
                     )
-                },
-                trailingIcon = {
-                    if (isError) {
-                        Icon(
-                            imageVector = Icons.Default.Warning,
-                            contentDescription = "Icono Warning"
-                        )
-                    }
-                },
-                isError = isError,
-                singleLine = true,
-
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(32.dp),
-                shape = RoundedCornerShape(12.dp),
-
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                    errorBorderColor = MaterialTheme.colorScheme.error,
-                    focusedLabelColor = MaterialTheme.colorScheme.primary,
-                    errorLabelColor = MaterialTheme.colorScheme.error
                 )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(text = if (accepted)"Aceptado" else "Aceptar los terminos y condiciones")
+            }
+        }
+    }
+
+    @Composable
+    fun PreferencesApp() {
+        val options = listOf(
+            "Notificaciones por correo",
+            "Notificaciones push",
+            "Ofertas especiales",
+            "Novedades del blog"
+        )
+
+        val stateOptions = remember {
+            mutableStateMapOf<String, Boolean>().apply {
+                options.forEach {
+                    put(it, false)
+                }
+            }
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(32.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Seleciona tus preferencias",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            if (isError) {
-                Text(
-                    text = "Máximo 10 caracteres",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(start = 16.dp, top = 5.dp)
-                )
+            LazyColumn {
+                items(options) {option->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                    ) {
+                        Checkbox(
+                            checked = stateOptions[option] == true,
+                            onCheckedChange = {stateOptions[option] = it},
+                            colors = CheckboxDefaults.colors(
+                                checkedColor = MaterialTheme.colorScheme.primary,
+                                checkmarkColor = MaterialTheme.colorScheme.onPrimary
+                            )
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Text(text = option)
+                    }
+                }
             }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            val selected = stateOptions.filter { it.value }.keys
+
+            Text(
+                text = "Seleccinadas: ${if(selected.isEmpty()) "Ninguna" else selected.joinToString ()}",
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }
