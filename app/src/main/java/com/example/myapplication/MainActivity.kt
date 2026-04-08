@@ -60,6 +60,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -124,55 +125,64 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                TextFieldExample()
+                OutlinedTextFieldExample()
             }
         }
     }
 
     @Composable
-    fun TextFieldExample() {
+    fun OutlinedTextFieldExample() {
         var text by remember { mutableStateOf("") }
-
         val isError = text.length >= 10
-
-
 
         Column(
             modifier = Modifier
-
                 .fillMaxSize()
                 .padding(32.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            TextField(
+            OutlinedTextField(
                 value = text,
                 onValueChange = {text = it},
                 label = {Text(text = "Nombre")},
-                placeholder = {Text(text = "Ingrese su nombre")},
+                placeholder = { Text(text = "Escribe tu nombre")},
                 leadingIcon = {
-                    Icon(Icons.Default.Person, contentDescription = "Icono personal")
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Icono Person"
+                    )
                 },
                 trailingIcon = {
-                    if (isError){
-                        Icon(Icons.Default.Warning, contentDescription = "Icono warning", tint = MaterialTheme.colorScheme.error)
+                    if (isError) {
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = "Icono Warning"
+                        )
                     }
                 },
                 isError = isError,
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    capitalization = KeyboardCapitalization.Words,
+
+                keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
                 ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(32.dp),
+                shape = RoundedCornerShape(12.dp),
 
-                    }
-                ),
-                modifier = Modifier.fillMaxWidth()
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    errorBorderColor = MaterialTheme.colorScheme.error,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                    errorLabelColor = MaterialTheme.colorScheme.error
+                )
             )
-            if (isError){
+
+            if (isError) {
                 Text(
                     text = "Máximo 10 caracteres",
                     color = MaterialTheme.colorScheme.error,
