@@ -40,6 +40,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
@@ -129,15 +131,13 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                RadioButtonExample()
+                SwitchExample()
             }
         }
     }
     @Composable
-    fun RadioButtonExample() {
-        val options = listOf("Opción A", "Opción B", "Opción C")
-
-        var selectedOption by remember { mutableStateOf(options[0]) }
+    fun SwitchExample() {
+        var wifiEnabled by remember { mutableStateOf(false) }
 
         Column(
             modifier = Modifier
@@ -146,50 +146,70 @@ class  MainActivity : ComponentActivity() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Seleccione una opción",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                items(options){option->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(5.dp)
-                    ) {
-                        RadioButton(
-                            selected = (option == selectedOption),
-                            onClick = {selectedOption = option},
-                            colors = RadioButtonDefaults.colors(
-                                selectedColor = MaterialTheme.colorScheme.primary,
-                                unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                disabledSelectedColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-                                disabledUnselectedColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                            )
-                        )
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = "WI-FI",
+                        style = MaterialTheme.typography.titleMedium
+                    )
 
-                        Text(
-                            text = option,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(start= 8.dp)
-                        )
-                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Text(
+                        text = if (wifiEnabled) "Conectado a la red" else "WIFI desactivado",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = "Opción seleccionada: $selectedOption",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
+                Switch(
+                    checked = wifiEnabled,
+                    onCheckedChange = {wifiEnabled = it},
+                    thumbContent = {
+                        if (wifiEnabled) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = "Activado",
+                                tint = Color.White,
+                                modifier = Modifier.size(SwitchDefaults.IconSize)
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Desactivado",
+                                tint = Color.White.copy(alpha = 0.8f),
+                                modifier = Modifier.size(SwitchDefaults.IconSize)
+                            )
+                        }
+                    },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colorScheme.primary,
+                        uncheckedThumbColor = MaterialTheme.colorScheme.surfaceVariant,
+                        checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
+                        uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                    )
+                )
+            }
         }
     }
+
+
+
+
+
+
+
+
+
+
 }
 
 
