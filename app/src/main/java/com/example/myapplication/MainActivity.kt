@@ -63,6 +63,8 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -127,59 +129,16 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                PreferencesApp()
+                RadioButtonExample()
             }
         }
     }
-
     @Composable
-    fun CheckBoxExample() {
-        var accepted by remember { mutableStateOf(false) }
+    fun RadioButtonExample() {
+        val options = listOf("Opción A", "Opción B", "Opción C")
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(32.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Checkbox(
-                    checked = accepted,
-                    onCheckedChange = {accepted = it},
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = MaterialTheme.colorScheme.primary,
-                        uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        checkmarkColor = MaterialTheme.colorScheme.onPrimary
-                    )
-                )
+        var selectedOption by remember { mutableStateOf(options[0]) }
 
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(text = if (accepted)"Aceptado" else "Aceptar los terminos y condiciones")
-            }
-        }
-    }
-
-    @Composable
-    fun PreferencesApp() {
-        val options = listOf(
-            "Notificaciones por correo",
-            "Notificaciones push",
-            "Ofertas especiales",
-            "Novedades del blog"
-        )
-
-        val stateOptions = remember {
-            mutableStateMapOf<String, Boolean>().apply {
-                options.forEach {
-                    put(it, false)
-                }
-            }
-        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -188,42 +147,46 @@ class  MainActivity : ComponentActivity() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Seleciona tus preferencias",
+                text = "Seleccione una opción",
                 style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            LazyColumn {
-                items(options) {option->
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                items(options){option->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
+                            .fillMaxSize()
+                            .padding(5.dp)
                     ) {
-                        Checkbox(
-                            checked = stateOptions[option] == true,
-                            onCheckedChange = {stateOptions[option] = it},
-                            colors = CheckboxDefaults.colors(
-                                checkedColor = MaterialTheme.colorScheme.primary,
-                                checkmarkColor = MaterialTheme.colorScheme.onPrimary
+                        RadioButton(
+                            selected = (option == selectedOption),
+                            onClick = {selectedOption = option},
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = MaterialTheme.colorScheme.primary,
+                                unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                disabledSelectedColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                                disabledUnselectedColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                             )
                         )
 
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        Text(text = option)
+                        Text(
+                            text = option,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(start= 8.dp)
+                        )
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            val selected = stateOptions.filter { it.value }.keys
+            Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Seleccinadas: ${if(selected.isEmpty()) "Ninguna" else selected.joinToString ()}",
-                style = MaterialTheme.typography.bodyMedium
+                text = "Opción seleccionada: $selectedOption",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.primary
             )
         }
     }
