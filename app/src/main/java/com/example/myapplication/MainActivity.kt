@@ -57,6 +57,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
@@ -79,6 +80,7 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -131,6 +133,9 @@ import com.example.myapplication.ui.theme.MyApplicationTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.w3c.dom.Text
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 class  MainActivity : ComponentActivity() {
@@ -139,59 +144,87 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                ModalButtonSheetExample()
+                DatePickerExample()
             }
         }
     }
+
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun ModalButtonSheetExample() {
-        val sheetState = rememberModalBottomSheetState(
-            skipPartiallyExpanded = true
-        )
+    fun DatePickerExample() {
+        val zoneId = ZoneId.systemDefault() /*Zona horaria del dispositivo */
+        val currentDate = LocalDate.now() /*Zona horaria específica del dispositivo */
 
-        var showSheet by remember { mutableStateOf(false) }
+        val startOfDayMillis = currentDate
+            .atStartOfDay(zoneId)
+            .toInstant()
+            .toEpochMilli()
 
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+
+        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = startOfDayMillis)
+
+        var selectedDateText by remember { mutableStateOf("") }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.height(8.dp))
+
+            DatePicker(
+                state = datePickerState,
+                showModeToggle = true,
+                modifier = Modifier.fillMaxWidth(),
+                title = {
+                    Text(
+                        text = "Título del DatePicker",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                },
+
+                headline = {
+                    Text(
+                        text = "Seleccione su fecha favorita",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+
             Button(
-                onClick = {showSheet = true}
-            ) {
-                Text(text = "Mostrar ModalButtonSheet")
-            }
-        }
+                onClick = {
+                    val selectedMillis = datePickerState.selectedDateMillis
 
-        if (showSheet) {
-            ModalBottomSheet(
-                onDismissRequest = {showSheet = false},
-                sheetState = sheetState,
-                containerColor = MaterialTheme.colorScheme.surface,
-                shape = MaterialTheme.shapes.large,
-                scrimColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.32f)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    horizontalAlignment= Alignment.CenterHorizontally
-                ) {
-                    Text(text = "¡Hola, desde el Modal Button Sheet")
+                    if (selectedMillis != null) {
+                        val daysSinceEpoch = selectedMillis / (24*60*60*1000)
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                        val localDate = LocalDate.ofEpochDay(daysSinceEpoch)
 
-                    Button(
-                        onClick = {showSheet = false}
-                    ) {
-                        Text(text = "Cerrar")
+                        val dateString = localDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                        selectedDateText = dateString
                     }
                 }
+            ) {
+                Text(text = "Confirmar fecha seleccionada")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (selectedDateText.isNotEmpty()) {
+                Text(
+                    text = "Fecha seleccionada: $selectedDateText",
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
-    }
 
+    }
 
 
 
