@@ -60,11 +60,13 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
@@ -77,6 +79,7 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -136,62 +139,56 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                AlertDialogExample()
+                ModalButtonSheetExample()
             }
         }
     }
+
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun AlertDialogExample() {
-        var showDialog by remember { mutableStateOf(false) }
+    fun ModalButtonSheetExample() {
+        val sheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = true
+        )
+
+        var showSheet by remember { mutableStateOf(false) }
 
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Button(
-                onClick = {showDialog = true}
+                onClick = {showSheet = true}
             ) {
-                Text(text = "Mostrar AlertDialog")
+                Text(text = "Mostrar ModalButtonSheet")
             }
         }
 
-        if (showDialog) {
-            AlertDialog(
-                onDismissRequest = {
-                    showDialog = false
-                },
-                icon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.alerta),
-                        tint = Color.Unspecified,
-                        contentDescription = "Alerta"
-                    )
-                },
-                title = {
-                    Text(text = "¿Estas seguro?")
-                },
-                text = {
-                    Text(text = "Esta acción no se puede deshacer. ¿Quieres continuar?")
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            showDialog = false
-                        }
+        if (showSheet) {
+            ModalBottomSheet(
+                onDismissRequest = {showSheet = false},
+                sheetState = sheetState,
+                containerColor = MaterialTheme.colorScheme.surface,
+                shape = MaterialTheme.shapes.large,
+                scrimColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.32f)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    horizontalAlignment= Alignment.CenterHorizontally
+                ) {
+                    Text(text = "¡Hola, desde el Modal Button Sheet")
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Button(
+                        onClick = {showSheet = false}
                     ) {
-                        Text(text = "Aceptar")
-                    }
-                },
-                dismissButton = {
-                    TextButton(
-                        onClick = {
-                            showDialog = false
-                        }
-                    ) {
-                        Text(text = "Caneclar")
+                        Text(text = "Cerrar")
                     }
                 }
-            )
+            }
         }
     }
 
