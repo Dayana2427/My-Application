@@ -46,6 +46,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
@@ -55,6 +56,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -113,6 +116,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -131,72 +135,80 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                SwitchExample()
+                DropDownMenuExample()
             }
         }
     }
     @Composable
-    fun SwitchExample() {
-        var wifiEnabled by remember { mutableStateOf(false) }
+    fun DropDownMenuExample() {
+
+        var expanded by remember { mutableStateOf(false) }
+        var selectedOption by remember { mutableStateOf<Pair<String, ImageVector>?>(null) }
+
+        val options = listOf(
+            "Inicio" to Icons.Default.Home,
+            "Favoritos" to Icons.Default.Favorite,
+            "Configuración" to Icons.Default.Settings
+        )
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(32.dp),
-            verticalArrangement = Arrangement.Center,
+                .fillMaxWidth()
+                .padding(top = 100.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
             ) {
-                Column(
-                    modifier = Modifier.weight(1f)
+                Button(
+                    onClick = {expanded = true}
                 ) {
-                    Text(
-                        text = "WI-FI",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Text(
-                        text = if (wifiEnabled) "Conectado a la red" else "WIFI desactivado",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                Switch(
-                    checked = wifiEnabled,
-                    onCheckedChange = {wifiEnabled = it},
-                    thumbContent = {
-                        if (wifiEnabled) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        selectedOption?.second?.let { icon ->
                             Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = "Activado",
-                                tint = Color.White,
-                                modifier = Modifier.size(SwitchDefaults.IconSize)
+                                imageVector = icon,
+                                contentDescription = selectedOption?.first,
+                                modifier = Modifier.size(20.dp)
                             )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = "Desactivado",
-                                tint = Color.White.copy(alpha = 0.8f),
-                                modifier = Modifier.size(SwitchDefaults.IconSize)
-                            )
+                            Spacer(modifier = Modifier.width(8.dp))
                         }
-                    },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = MaterialTheme.colorScheme.primary,
-                        uncheckedThumbColor = MaterialTheme.colorScheme.surfaceVariant,
-                        checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
-                        uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                    )
-                )
+
+                        Text(
+                            selectedOption?.first ?: "Selecciona una opción"
+                        )
+                    }
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = {expanded = false},
+                    offset = DpOffset(x = (-60).dp, y = 0.dp)
+                ) {
+                    options.forEach { (text,  icon)->
+                        DropdownMenuItem(
+                            text = {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = icon,
+                                        contentDescription = text,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+
+                                    Text(text = text)
+                                }
+                            },
+                            onClick = {
+                                selectedOption = text to icon
+                                expanded = false
+                            }
+                        )
+                    }
+                }
             }
         }
     }
