@@ -1,6 +1,6 @@
 package com.example.myapplication
 
-import android.R
+import android.app.AlertDialog
 import androidx.compose.foundation.lazy.grid.items
 import android.os.Bundle
 import android.util.Log
@@ -49,6 +49,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -135,81 +136,62 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                DropDownMenuExample()
+                AlertDialogExample()
             }
         }
     }
     @Composable
-    fun DropDownMenuExample() {
+    fun AlertDialogExample() {
+        var showDialog by remember { mutableStateOf(false) }
 
-        var expanded by remember { mutableStateOf(false) }
-        var selectedOption by remember { mutableStateOf<Pair<String, ImageVector>?>(null) }
-
-        val options = listOf(
-            "Inicio" to Icons.Default.Home,
-            "Favoritos" to Icons.Default.Favorite,
-            "Configuración" to Icons.Default.Settings
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 100.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
+            Button(
+                onClick = {showDialog = true}
             ) {
-                Button(
-                    onClick = {expanded = true}
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        selectedOption?.second?.let { icon ->
-                            Icon(
-                                imageVector = icon,
-                                contentDescription = selectedOption?.first,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                        }
-
-                        Text(
-                            selectedOption?.first ?: "Selecciona una opción"
-                        )
-                    }
-                }
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = {expanded = false},
-                    offset = DpOffset(x = (-60).dp, y = 0.dp)
-                ) {
-                    options.forEach { (text,  icon)->
-                        DropdownMenuItem(
-                            text = {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        imageVector = icon,
-                                        contentDescription = text,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-
-                                    Text(text = text)
-                                }
-                            },
-                            onClick = {
-                                selectedOption = text to icon
-                                expanded = false
-                            }
-                        )
-                    }
-                }
+                Text(text = "Mostrar AlertDialog")
             }
+        }
+
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = {
+                    showDialog = false
+                },
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.alerta),
+                        tint = Color.Unspecified,
+                        contentDescription = "Alerta"
+                    )
+                },
+                title = {
+                    Text(text = "¿Estas seguro?")
+                },
+                text = {
+                    Text(text = "Esta acción no se puede deshacer. ¿Quieres continuar?")
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showDialog = false
+                        }
+                    ) {
+                        Text(text = "Aceptar")
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = {
+                            showDialog = false
+                        }
+                    ) {
+                        Text(text = "Caneclar")
+                    }
+                }
+            )
         }
     }
 
