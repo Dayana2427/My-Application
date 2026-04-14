@@ -1,10 +1,12 @@
 package com.example.myapplication
 
 import android.app.AlertDialog
+import android.app.DatePickerDialog
 import androidx.compose.foundation.lazy.grid.items
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.DatePicker
 import android.widget.Space
 import android.widget.Switch
 import android.widget.Toast
@@ -144,9 +146,92 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                DatePickerExample()
+                DatePickerDialogExample()
             }
         }
+    }
+
+
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun DatePickerDialogExample() {
+        val zoneId = ZoneId.systemDefault()
+        val currentDate = LocalDate.now(zoneId)
+        val startOfDayMillis = currentDate
+            .atStartOfDay(zoneId)
+            .toInstant()
+            .toEpochMilli()
+
+        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = startOfDayMillis)
+
+        var selectedDateText by remember { mutableStateOf("") }
+
+        var showDialog by remember { mutableStateOf(false) }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Button(
+                onClick = {showDialog = true}
+            ) {
+                Text(text = "Abrir calendario")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (selectedDateText.isNotEmpty()) {
+                Text(text = "Fecha seleccionada: $selectedDateText",
+                    style = MaterialTheme.typography.bodyLarge)
+            }
+        }
+
+        if (showDialog) {
+            androidx.compose.material3.DatePickerDialog(
+                onDismissRequest = {showDialog = false},
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            val selectedMillis = datePickerState.selectedDateMillis
+                            if (selectedMillis != null) {
+                                val daysSinceEpoch = selectedMillis / (24 * 60 * 60 * 1000)
+                                val localDate = LocalDate.ofEpochDay(daysSinceEpoch)
+                                val dateString = localDate.format(DateTimeFormatter.ofPattern("dd/MM/yyy"))
+                                selectedDateText = dateString
+                            }
+                            showDialog = false
+                        }
+                    ) {
+                        Text(text = "Aceptar")
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = {showDialog = false }
+                    ) { Text(text = "Cancelar")}
+                }
+            ) {
+                DatePicker(
+                    state = datePickerState,
+                    showModeToggle = true,
+                    modifier = Modifier.fillMaxWidth().padding(8.dp),
+                    title = {
+                        Text(text = "Título de DatePicker", style = MaterialTheme.typography.titleLarge)
+                    },
+                    headline = {
+                        Text(text = "Selecciones su fecha favorita", style = MaterialTheme.typography.bodyLarge)
+                    }
+                )
+            }
+        }
+
+
+
+
     }
 
 
