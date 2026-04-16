@@ -82,8 +82,13 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerColors
+import androidx.compose.material3.TimePickerDefaults
+import androidx.compose.material3.TimePickerLayoutType
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -138,6 +143,7 @@ import org.w3c.dom.Text
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 import java.util.UUID
 
 class  MainActivity : ComponentActivity() {
@@ -146,28 +152,23 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                DatePickerDialogExample()
+                TimePickerExample()
             }
         }
     }
 
-
-
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun DatePickerDialogExample() {
-        val zoneId = ZoneId.systemDefault()
-        val currentDate = LocalDate.now(zoneId)
-        val startOfDayMillis = currentDate
-            .atStartOfDay(zoneId)
-            .toInstant()
-            .toEpochMilli()
+    fun TimePickerExample(){
+        val timePickerState = rememberTimePickerState(
+            initialHour = 10,
+            initialMinute = 15,
+            is24Hour = false
+        )
 
-        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = startOfDayMillis)
 
-        var selectedDateText by remember { mutableStateOf("") }
+        var selectedTimeText by remember { mutableStateOf("") }
 
-        var showDialog by remember { mutableStateOf(false) }
 
         Column(
             modifier = Modifier
@@ -176,146 +177,53 @@ class  MainActivity : ComponentActivity() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Button(
-                onClick = {showDialog = true}
-            ) {
-                Text(text = "Abrir calendario")
-            }
+            Text(
+                text = if (selectedTimeText.isEmpty()) "Seleccione una hora"
+                else "Hora seleccionada: $selectedTimeText"
+            )
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (selectedDateText.isNotEmpty()) {
-                Text(text = "Fecha seleccionada: $selectedDateText",
-                    style = MaterialTheme.typography.bodyLarge)
-            }
-        }
-
-        if (showDialog) {
-            androidx.compose.material3.DatePickerDialog(
-                onDismissRequest = {showDialog = false},
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            val selectedMillis = datePickerState.selectedDateMillis
-                            if (selectedMillis != null) {
-                                val daysSinceEpoch = selectedMillis / (24 * 60 * 60 * 1000)
-                                val localDate = LocalDate.ofEpochDay(daysSinceEpoch)
-                                val dateString = localDate.format(DateTimeFormatter.ofPattern("dd/MM/yyy"))
-                                selectedDateText = dateString
-                            }
-                            showDialog = false
-                        }
-                    ) {
-                        Text(text = "Aceptar")
-                    }
-                },
-                dismissButton = {
-                    TextButton(
-                        onClick = {showDialog = false }
-                    ) { Text(text = "Cancelar")}
-                }
-            ) {
-                DatePicker(
-                    state = datePickerState,
-                    showModeToggle = true,
-                    modifier = Modifier.fillMaxWidth().padding(8.dp),
-                    title = {
-                        Text(text = "Título de DatePicker", style = MaterialTheme.typography.titleLarge)
-                    },
-                    headline = {
-                        Text(text = "Selecciones su fecha favorita", style = MaterialTheme.typography.bodyLarge)
-                    }
+            TimePicker(
+                state = timePickerState,
+                layoutType = TimePickerLayoutType.Vertical,
+                colors = TimePickerDefaults.colors(
+                    clockDialColor = MaterialTheme.colorScheme.secondaryContainer,
+                    clockDialSelectedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    clockDialUnselectedContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                    selectorColor = MaterialTheme.colorScheme.primary,
+                    periodSelectorBorderColor = MaterialTheme.colorScheme.primary,
+                    periodSelectorSelectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    periodSelectorUnselectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    periodSelectorSelectedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    periodSelectorUnselectedContentColor = MaterialTheme.colorScheme.onSurface
                 )
-            }
-        }
-
-
-
-
-    }
-
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun DatePickerExample() {
-        val zoneId = ZoneId.systemDefault() /*Zona horaria del dispositivo */
-        val currentDate = LocalDate.now() /*Zona horaria específica del dispositivo */
-
-        val startOfDayMillis = currentDate
-            .atStartOfDay(zoneId)
-            .toInstant()
-            .toEpochMilli()
-
-
-        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = startOfDayMillis)
-
-        var selectedDateText by remember { mutableStateOf("") }
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(modifier = Modifier.height(8.dp))
-
-            DatePicker(
-                state = datePickerState,
-                showModeToggle = true,
-                modifier = Modifier.fillMaxWidth(),
-                title = {
-                    Text(
-                        text = "Título del DatePicker",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                },
-
-                headline = {
-                    Text(
-                        text = "Seleccione su fecha favorita",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-
             Button(
                 onClick = {
-                    val selectedMillis = datePickerState.selectedDateMillis
+                    val hour24 = timePickerState.hour
+                    val minute = timePickerState.minute
 
-                    if (selectedMillis != null) {
-                        val daysSinceEpoch = selectedMillis / (24*60*60*1000)
+                    val amPm = if (hour24 < 12 ) "AM" else "PM"
 
-                        val localDate = LocalDate.ofEpochDay(daysSinceEpoch)
 
-                        val dateString = localDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-                        selectedDateText = dateString
+                    val hour12 = when {
+                        hour24 == 0 -> 12
+                        hour24 > 24 -> hour24 - 12
+                        else -> hour24
                     }
+
+                    selectedTimeText = String.format(Locale.getDefault(), "%02d:%02d %s", hour12, minute, amPm )
                 }
             ) {
-                Text(text = "Confirmar fecha seleccionada")
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (selectedDateText.isNotEmpty()) {
-                Text(
-                    text = "Fecha seleccionada: $selectedDateText",
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                Text(text = "Confirmar hora")
             }
         }
-
     }
-
-
-
-
-
-
 
 
 
