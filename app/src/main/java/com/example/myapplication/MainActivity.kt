@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.DatePicker
 import android.widget.Space
 import android.widget.Switch
+import android.widget.TimePicker
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -41,16 +42,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -85,6 +76,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerColors
 import androidx.compose.material3.TimePickerDefaults
+import androidx.compose.material3.TimePickerDialog
 import androidx.compose.material3.TimePickerLayoutType
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -152,10 +144,108 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                TimePickerExample()
+                TimePickerDialogExample()
             }
         }
     }
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun TimePickerDialogExample() {
+        val timePickerState =rememberTimePickerState(
+            initialHour = 10,
+            initialMinute = 15,
+            is24Hour = false
+        )
+        var showDialog by remember { mutableStateOf(false) }
+
+        var selectedTimeText by remember { mutableStateOf("") }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = if(selectedTimeText.isEmpty()) "Seleccionar una hora"
+                else "Hora seleccionada: $selectedTimeText"
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+             Button(onClick = {showDialog = true}) {
+                 Text(text = "Abrir TimePickerDialog")
+             }
+
+            if (showDialog) {
+                TimePickerDialog(
+                    onDismissRequest = {
+                        showDialog = false
+                    },
+                    title = {
+                        Text(text = "Seleccionar una hora")
+                    },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            val hour24 = timePickerState.hour
+                            val minute = timePickerState.minute
+
+                            val amPm = if (hour24 < 12) "AM" else "PM"
+
+                            val hour12 = when{
+                                hour24 == 0 -> 12
+                                hour24 > 12 -> hour24 -12
+                                else -> hour24
+                            }
+
+                            selectedTimeText = String.format(
+                                Locale.getDefault(),
+                                "%02d:%02d %S",
+                                hour12, minute, amPm
+                            )
+
+                            showDialog = false
+                        }) {
+                            Text(text = "Confirmar")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = {showDialog = false}) {
+                            Text(text = "Cancelar")
+                        }
+                    }
+                ) {
+                    TimePicker(
+                        state = timePickerState,
+                        layoutType = TimePickerLayoutType.Vertical,
+                        colors = TimePickerDefaults.colors(
+                            clockDialColor = MaterialTheme.colorScheme.secondaryContainer,
+                            clockDialSelectedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            clockDialUnselectedContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            selectorColor = MaterialTheme.colorScheme.primary,
+                            periodSelectorBorderColor = MaterialTheme.colorScheme.primary,
+                            periodSelectorSelectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                            periodSelectorUnselectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            periodSelectorSelectedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            periodSelectorUnselectedContentColor = MaterialTheme.colorScheme.onSurface
+                        )
+                    )
+                }
+            }
+
+        }
+    }
+
+
+
+
+
+
+
+
+
+
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -224,9 +314,6 @@ class  MainActivity : ComponentActivity() {
             }
         }
     }
-
-
-
 }
 
 
