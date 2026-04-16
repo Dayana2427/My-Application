@@ -42,6 +42,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -76,7 +78,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerColors
 import androidx.compose.material3.TimePickerDefaults
-import androidx.compose.material3.TimePickerDialog
 import androidx.compose.material3.TimePickerLayoutType
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -144,176 +145,86 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                TimePickerDialogExample()
+                IndeterminateCircularProgressIndicator()
             }
         }
     }
-    @OptIn(ExperimentalMaterial3Api::class)
+
     @Composable
-    fun TimePickerDialogExample() {
-        val timePickerState =rememberTimePickerState(
-            initialHour = 10,
-            initialMinute = 15,
-            is24Hour = false
-        )
-        var showDialog by remember { mutableStateOf(false) }
+    fun IndeterminateCircularProgressIndicator() {
+        var isLoading by remember { mutableStateOf(false) }
+        var startOperation by remember { mutableStateOf(false) }
 
-        var selectedTimeText by remember { mutableStateOf("") }
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = if(selectedTimeText.isEmpty()) "Seleccionar una hora"
-                else "Hora seleccionada: $selectedTimeText"
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-             Button(onClick = {showDialog = true}) {
-                 Text(text = "Abrir TimePickerDialog")
-             }
-
-            if (showDialog) {
-                TimePickerDialog(
-                    onDismissRequest = {
-                        showDialog = false
-                    },
-                    title = {
-                        Text(text = "Seleccionar una hora")
-                    },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            val hour24 = timePickerState.hour
-                            val minute = timePickerState.minute
-
-                            val amPm = if (hour24 < 12) "AM" else "PM"
-
-                            val hour12 = when{
-                                hour24 == 0 -> 12
-                                hour24 > 12 -> hour24 -12
-                                else -> hour24
-                            }
-
-                            selectedTimeText = String.format(
-                                Locale.getDefault(),
-                                "%02d:%02d %S",
-                                hour12, minute, amPm
-                            )
-
-                            showDialog = false
-                        }) {
-                            Text(text = "Confirmar")
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = {showDialog = false}) {
-                            Text(text = "Cancelar")
-                        }
+        LaunchedEffect(startOperation) {
+            if (startOperation) {
+                simulateSlowProcess(
+                    onStart = {isLoading = true},
+                    onFinish = {
+                        isLoading = false
+                        startOperation = false
                     }
-                ) {
-                    TimePicker(
-                        state = timePickerState,
-                        layoutType = TimePickerLayoutType.Vertical,
-                        colors = TimePickerDefaults.colors(
-                            clockDialColor = MaterialTheme.colorScheme.secondaryContainer,
-                            clockDialSelectedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                            clockDialUnselectedContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                            selectorColor = MaterialTheme.colorScheme.primary,
-                            periodSelectorBorderColor = MaterialTheme.colorScheme.primary,
-                            periodSelectorSelectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                            periodSelectorUnselectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                            periodSelectorSelectedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                            periodSelectorUnselectedContentColor = MaterialTheme.colorScheme.onSurface
-                        )
-                    )
-                }
-            }
-
-        }
-    }
-
-
-
-
-
-
-
-
-
-
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun TimePickerExample(){
-        val timePickerState = rememberTimePickerState(
-            initialHour = 10,
-            initialMinute = 15,
-            is24Hour = false
-        )
-
-
-        var selectedTimeText by remember { mutableStateOf("") }
-
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = if (selectedTimeText.isEmpty()) "Seleccione una hora"
-                else "Hora seleccionada: $selectedTimeText"
-            )
-
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            TimePicker(
-                state = timePickerState,
-                layoutType = TimePickerLayoutType.Vertical,
-                colors = TimePickerDefaults.colors(
-                    clockDialColor = MaterialTheme.colorScheme.secondaryContainer,
-                    clockDialSelectedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    clockDialUnselectedContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                    selectorColor = MaterialTheme.colorScheme.primary,
-                    periodSelectorBorderColor = MaterialTheme.colorScheme.primary,
-                    periodSelectorSelectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    periodSelectorUnselectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    periodSelectorSelectedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    periodSelectorUnselectedContentColor = MaterialTheme.colorScheme.onSurface
                 )
-            )
+            }
+        }
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (isLoading){
+                CircularProgressIndicator(
+                    modifier = Modifier.size(64.dp),
+                    strokeWidth = 6.dp,
+                    color = MaterialTheme.colorScheme.primary
+                )
 
-            Button(
-                onClick = {
-                    val hour24 = timePickerState.hour
-                    val minute = timePickerState.minute
+                Spacer(modifier = Modifier.height(16.dp))
 
-                    val amPm = if (hour24 < 12 ) "AM" else "PM"
+                Text(
+                    text = "Procesando operación...",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Filled.CheckCircle,
+                    contentDescription = "Operación completada",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(64.dp)
+                )
 
+                Spacer(modifier = Modifier.height(16.dp))
 
-                    val hour12 = when {
-                        hour24 == 0 -> 12
-                        hour24 > 24 -> hour24 - 12
-                        else -> hour24
-                    }
+                Text(
+                    text = "Operación completada",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
 
-                    selectedTimeText = String.format(Locale.getDefault(), "%02d:%02d %s", hour12, minute, amPm )
-                }
-            ) {
-                Text(text = "Confirmar hora")
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(onClick = {startOperation = true}) {
+                Text(text = "IniciarOperación")
             }
         }
     }
+
+    private suspend fun simulateSlowProcess(
+        onStart : () -> Unit,
+        onFinish : () -> Unit
+    ) {
+        onStart()
+        delay(3000)
+        onFinish()
+    }
+
+
+
+
+
+
 }
 
 
