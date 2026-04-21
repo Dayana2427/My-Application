@@ -147,10 +147,88 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                IndeterminateLinearProgressIndicator()
+                DeterminateLinearProgressIndicator()
             }
         }
     }
+
+    @Composable
+    fun DeterminateLinearProgressIndicator() {
+        var progress by remember { mutableFloatStateOf(0f) }
+
+        var isDownloading by remember { mutableStateOf(false) }
+
+        var downloadComplete by remember { mutableStateOf(false) }
+
+        LaunchedEffect(isDownloading) {
+            if (isDownloading) {
+                downloadComplete = false
+                while (progress < 1f) {
+                    delay(200)
+                    progress += 0.05f
+                }
+
+                isDownloading = false
+                downloadComplete = true
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = "Descarga de archivo", style = MaterialTheme.typography.titleMedium)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (isDownloading) {
+                LinearProgressIndicator(
+                    progress = {progress},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(text = "${(progress * 100).toInt()}%", style = MaterialTheme.typography.bodyLarge)
+            }
+
+            Button(
+                onClick = {
+                    if (!isDownloading) {
+                        progress = 0f
+                        isDownloading = true
+                    }
+                },
+                enabled = !isDownloading
+            ) {
+                Text(text = "Inciar descarga")
+            }
+            if (downloadComplete) {
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Text(
+                    text = "Archivo descargado exitosamente",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
+
+
+
+
+
+
+
+
 
     @Composable
     fun IndeterminateLinearProgressIndicator() {
