@@ -89,6 +89,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -145,25 +146,27 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                IndeterminateCircularProgressIndicator()
+                DeterminateProgressCircularIndicator()
             }
         }
     }
 
     @Composable
-    fun IndeterminateCircularProgressIndicator() {
-        var isLoading by remember { mutableStateOf(false) }
-        var startOperation by remember { mutableStateOf(false) }
+    fun DeterminateProgressCircularIndicator() {
 
-        LaunchedEffect(startOperation) {
-            if (startOperation) {
-                simulateSlowProcess(
-                    onStart = {isLoading = true},
-                    onFinish = {
-                        isLoading = false
-                        startOperation = false
-                    }
-                )
+        var progress by remember { mutableFloatStateOf(0f) }
+
+        var startDownload by remember { mutableStateOf(false) }
+
+        LaunchedEffect(startDownload) {
+            if (startDownload) {
+                repeat(20){
+                    delay(150)
+                    progress += 0.05f
+                }
+
+                progress = 1f
+                startDownload = false
             }
         }
 
@@ -174,50 +177,50 @@ class  MainActivity : ComponentActivity() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (isLoading){
-                CircularProgressIndicator(
-                    modifier = Modifier.size(64.dp),
-                    strokeWidth = 6.dp,
-                    color = MaterialTheme.colorScheme.primary
-                )
+            Text(text = "Descarga de archivo", style = MaterialTheme.typography.titleMedium)
 
-                Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-                Text(
-                    text = "Procesando operación...",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Filled.CheckCircle,
-                    contentDescription = "Operación completada",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(64.dp)
-                )
+            CircularProgressIndicator(
+                progress = {progress},
+                modifier = Modifier.size(80.dp),
+                strokeWidth = 10.dp,
+                color = if (progress < 1f)
+                    MaterialTheme.colorScheme.primary
+                else
+                    MaterialTheme.colorScheme.secondary
+            )
 
-                Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-                Text(
-                    text = "Operación completada",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
+            Text(text = "${(progress * 100).toInt()}%",
+                style = MaterialTheme.typography.bodyLarge)
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Button(onClick = {startOperation = true}) {
-                Text(text = "IniciarOperación")
+            Button(
+                onClick = { startDownload = true },
+                enabled = progress < 1f && !startDownload
+            ) {
+                Text(
+                    if (progress < 1f) "Iniciar decsraga"
+                    else "Descarga completa"
+                )
+            }
+
+            if (progress >= 1f){
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = {
+                        progress = 0f
+                        startDownload = false
+                    }
+                ) {
+                    Text(text = "Reiniciar")
+                }
             }
         }
-    }
-
-    private suspend fun simulateSlowProcess(
-        onStart : () -> Unit,
-        onFinish : () -> Unit
-    ) {
-        onStart()
-        delay(3000)
-        onFinish()
     }
 
 
