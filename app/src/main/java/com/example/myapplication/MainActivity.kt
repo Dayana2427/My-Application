@@ -70,6 +70,8 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -147,31 +149,14 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                DeterminateLinearProgressIndicator()
+                SliderExample()
             }
         }
     }
 
     @Composable
-    fun DeterminateLinearProgressIndicator() {
-        var progress by remember { mutableFloatStateOf(0f) }
-
-        var isDownloading by remember { mutableStateOf(false) }
-
-        var downloadComplete by remember { mutableStateOf(false) }
-
-        LaunchedEffect(isDownloading) {
-            if (isDownloading) {
-                downloadComplete = false
-                while (progress < 1f) {
-                    delay(200)
-                    progress += 0.05f
-                }
-
-                isDownloading = false
-                downloadComplete = true
-            }
-        }
+    fun SliderExample() {
+        var sliderValue by remember { mutableFloatStateOf(50f) }
 
         Column(
             modifier = Modifier
@@ -180,106 +165,28 @@ class  MainActivity : ComponentActivity() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Descarga de archivo", style = MaterialTheme.typography.titleMedium)
+            Text(
+                text = "Volumen actual: ${sliderValue.toInt()}",
+                style = MaterialTheme.typography.titleMedium
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (isDownloading) {
-                LinearProgressIndicator(
-                    progress = {progress},
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(8.dp),
-                    color = MaterialTheme.colorScheme.primary,
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(text = "${(progress * 100).toInt()}%", style = MaterialTheme.typography.bodyLarge)
-            }
-
-            Button(
-                onClick = {
-                    if (!isDownloading) {
-                        progress = 0f
-                        isDownloading = true
-                    }
+            Slider(
+                value = sliderValue,
+                onValueChange = {sliderValue = it},
+                valueRange = 0f..100f,
+                steps = 3,
+                onValueChangeFinished = {
+                    println("El usuario soltó el slider en $sliderValue")
                 },
-                enabled = !isDownloading
-            ) {
-                Text(text = "Inciar descarga")
-            }
-            if (downloadComplete) {
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    text = "Archivo descargado exitosamente",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.primary
+                colors = SliderDefaults.colors(
+                    activeTrackColor = MaterialTheme.colorScheme.primary,
+                    inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant,
+                    thumbColor = MaterialTheme.colorScheme.primary
                 )
-            }
-        }
-    }
+            )
 
-
-
-
-
-
-
-
-
-    @Composable
-    fun IndeterminateLinearProgressIndicator() {
-
-        var isLoading by remember { mutableStateOf(false) }
-
-        var isCompleted by remember { mutableStateOf(false) }
-
-        LaunchedEffect(isLoading) {
-            if (isLoading) {
-                delay(5000)
-                isLoading = false
-                isCompleted= true
-            }
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            if (isLoading) {
-                Text("Procesando datos...", style = MaterialTheme.typography.titleMedium)
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                LinearProgressIndicator(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(8.dp),
-                    color = MaterialTheme.colorScheme.primary,
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                    strokeCap = StrokeCap.Round
-                )
-            } else if (isCompleted) {
-                Text(text = "Operación finalizada", style = MaterialTheme.typography.titleMedium)
-
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-
-            Button(
-                onClick = {
-                    isLoading = true
-                    isCompleted = false
-                },
-                enabled = !isLoading
-            ) {
-                Text(text = "Iniciar operación")
-            }
         }
     }
 
