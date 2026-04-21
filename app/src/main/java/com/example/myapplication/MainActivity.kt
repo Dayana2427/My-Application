@@ -111,6 +111,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -146,27 +147,23 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                DeterminateProgressCircularIndicator()
+                IndeterminateLinearProgressIndicator()
             }
         }
     }
 
     @Composable
-    fun DeterminateProgressCircularIndicator() {
+    fun IndeterminateLinearProgressIndicator() {
 
-        var progress by remember { mutableFloatStateOf(0f) }
+        var isLoading by remember { mutableStateOf(false) }
 
-        var startDownload by remember { mutableStateOf(false) }
+        var isCompleted by remember { mutableStateOf(false) }
 
-        LaunchedEffect(startDownload) {
-            if (startDownload) {
-                repeat(20){
-                    delay(150)
-                    progress += 0.05f
-                }
-
-                progress = 1f
-                startDownload = false
+        LaunchedEffect(isLoading) {
+            if (isLoading) {
+                delay(5000)
+                isLoading = false
+                isCompleted= true
             }
         }
 
@@ -177,48 +174,33 @@ class  MainActivity : ComponentActivity() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Descarga de archivo", style = MaterialTheme.typography.titleMedium)
+            if (isLoading) {
+                Text("Procesando datos...", style = MaterialTheme.typography.titleMedium)
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            CircularProgressIndicator(
-                progress = {progress},
-                modifier = Modifier.size(80.dp),
-                strokeWidth = 10.dp,
-                color = if (progress < 1f)
-                    MaterialTheme.colorScheme.primary
-                else
-                    MaterialTheme.colorScheme.secondary
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(text = "${(progress * 100).toInt()}%",
-                style = MaterialTheme.typography.bodyLarge)
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Button(
-                onClick = { startDownload = true },
-                enabled = progress < 1f && !startDownload
-            ) {
-                Text(
-                    if (progress < 1f) "Iniciar decsraga"
-                    else "Descarga completa"
-                )
-            }
-
-            if (progress >= 1f){
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Button(
-                    onClick = {
-                        progress = 0f
-                        startDownload = false
-                    }
-                ) {
-                    Text(text = "Reiniciar")
-                }
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                    strokeCap = StrokeCap.Round
+                )
+            } else if (isCompleted) {
+                Text(text = "Operación finalizada", style = MaterialTheme.typography.titleMedium)
+
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+
+            Button(
+                onClick = {
+                    isLoading = true
+                    isCompleted = false
+                },
+                enabled = !isLoading
+            ) {
+                Text(text = "Iniciar operación")
             }
         }
     }
