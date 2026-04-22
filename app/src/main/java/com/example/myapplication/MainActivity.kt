@@ -69,6 +69,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -149,10 +150,63 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                SliderExample()
+                RangeSliderExample()
             }
         }
     }
+
+    @Composable
+    fun RangeSliderExample() {
+        var priceRange by remember { mutableStateOf(50f..300f) }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Filtar por precio: ",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "${priceRange.start.toInt()} USD - ${priceRange.endInclusive.toInt()} USD",
+                style = MaterialTheme.typography.bodyLarge
+            )
+
+            RangeSlider(
+                value = priceRange,
+                onValueChange = {priceRange = it},
+                valueRange = 0f..500f,
+                steps = 9,
+                onValueChangeFinished = {
+                    println("Precio seleccionado: ${priceRange.start} - ${priceRange.endInclusive}")
+                },
+                colors = SliderDefaults.colors(
+                    activeTrackColor = MaterialTheme.colorScheme.primary,
+                    inactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                    thumbColor = MaterialTheme.colorScheme.primary
+                )
+            )
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @Composable
     fun SliderExample() {
