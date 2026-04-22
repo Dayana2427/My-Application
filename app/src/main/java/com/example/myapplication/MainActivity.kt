@@ -150,98 +150,26 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                RangeSliderExample()
+                ScaffoldScreen()
             }
         }
     }
 
     @Composable
-    fun RangeSliderExample() {
-        var priceRange by remember { mutableStateOf(50f..300f) }
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Filtar por precio: ",
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "${priceRange.start.toInt()} USD - ${priceRange.endInclusive.toInt()} USD",
-                style = MaterialTheme.typography.bodyLarge
-            )
-
-            RangeSlider(
-                value = priceRange,
-                onValueChange = {priceRange = it},
-                valueRange = 0f..500f,
-                steps = 9,
-                onValueChangeFinished = {
-                    println("Precio seleccionado: ${priceRange.start} - ${priceRange.endInclusive}")
-                },
-                colors = SliderDefaults.colors(
-                    activeTrackColor = MaterialTheme.colorScheme.primary,
-                    inactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-                    thumbColor = MaterialTheme.colorScheme.primary
-                )
-            )
-        }
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    @Composable
-    fun SliderExample() {
-        var sliderValue by remember { mutableFloatStateOf(50f) }
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Volumen actual: ${sliderValue.toInt()}",
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Slider(
-                value = sliderValue,
-                onValueChange = {sliderValue = it},
-                valueRange = 0f..100f,
-                steps = 3,
-                onValueChangeFinished = {
-                    println("El usuario soltó el slider en $sliderValue")
-                },
-                colors = SliderDefaults.colors(
-                    activeTrackColor = MaterialTheme.colorScheme.primary,
-                    inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant,
-                    thumbColor = MaterialTheme.colorScheme.primary
-                )
-            )
-
-        }
+    fun ScaffoldScreen() {
+        Scaffold(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            content = {paddingValues ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "Contenido principal")
+                }
+            }
+        )
     }
 
 
