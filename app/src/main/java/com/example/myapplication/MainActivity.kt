@@ -45,12 +45,15 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -164,7 +167,7 @@ class  MainActivity : ComponentActivity() {
     fun ScaffoldScreen() {
         Scaffold(
             topBar = {
-                TopAppBar(
+                CenterAlignedTopAppBar(
                     title = {
                         Text(text = "Mi aplicación")
                     },
@@ -179,8 +182,14 @@ class  MainActivity : ComponentActivity() {
                     actions = {
                         IconButton(onClick = {}) {
                             Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = "Buscar"
+                                imageVector = Icons.Default.Notifications,
+                                contentDescription = "Notificaciones"
+                            )
+                        }
+                        IconButton(onClick = {}) {
+                            Icon(
+                                imageVector = Icons.Default.Settings,
+                                contentDescription = "Configuración"
                             )
                         }
                     },
