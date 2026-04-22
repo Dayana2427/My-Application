@@ -26,9 +26,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -44,11 +46,14 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -165,7 +170,8 @@ class  MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun ScaffoldScreen() {
-        Scaffold(
+        Scaffold(/*Estructura visual báscia con slots como topBar, bottomBar, FAB, etc*/
+            /*1. topBar*/
             topBar = {
                 CenterAlignedTopAppBar(
                     title = {
@@ -201,6 +207,37 @@ class  MainActivity : ComponentActivity() {
                     )
                 )
             },
+            /*2.bottomBar*/
+            bottomBar = {
+                BottomAppBar(
+                    actions = {
+                        IconButton(onClick = {}) {
+                            Icon(
+                                imageVector = Icons.Default.Home,
+                                contentDescription = "Inicio"
+                            )
+                        }
+                        IconButton(onClick = {}) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Buscar"
+                            )
+                        }
+
+                        IconButton(onClick = {}) {
+                            Icon(
+                                imageVector = Icons.Default.Favorite,
+                                contentDescription = "Favortos"
+                            )
+                        }
+                    },
+                    tonalElevation = 6.dp,
+                    windowInsets = WindowInsets.navigationBars,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                )
+            },
+
 
 
             containerColor = MaterialTheme.colorScheme.primaryContainer,
