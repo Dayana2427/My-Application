@@ -52,6 +52,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
@@ -79,6 +80,9 @@ import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
@@ -180,6 +184,12 @@ class  MainActivity : ComponentActivity() {
 
         var isExpanded by remember {mutableStateOf(true) }
 
+        val items = listOf("Inicio", "Buscar", "Perfil")
+
+        val icons = listOf(Icons.Default.Home, Icons.Default.Search, Icons.Default.Person)
+
+         var selectedItem by rememberSaveable { mutableIntStateOf(0) }
+
         Scaffold(/*Estructura visual báscia con slots como topBar, bottomBar, FAB, etc*/
             /*1. topBar*/
             topBar = {
@@ -219,33 +229,28 @@ class  MainActivity : ComponentActivity() {
             },
             /*2.bottomBar*/
             bottomBar = {
-                BottomAppBar(
-                    actions = {
-                        IconButton(onClick = {}) {
-                            Icon(
-                                imageVector = Icons.Default.Home,
-                                contentDescription = "Inicio"
-                            )
-                        }
-                        IconButton(onClick = {}) {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = "Buscar"
-                            )
-                        }
-
-                        IconButton(onClick = {}) {
-                            Icon(
-                                imageVector = Icons.Default.Favorite,
-                                contentDescription = "Favortos"
-                            )
-                        }
-                    },
-                    tonalElevation = 6.dp,
-                    windowInsets = WindowInsets.navigationBars,
+                NavigationBar(
+                    modifier = Modifier.fillMaxWidth(),
                     containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                )
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    tonalElevation = 3.dp,
+                    windowInsets = NavigationBarDefaults.windowInsets
+                ) {
+                    items.forEachIndexed {index, label ->
+                        NavigationBarItem(
+                            onClick = {selectedItem = index},
+                            selected = selectedItem == index,
+                            icon = {
+                                Icon(
+                                    imageVector = icons[index],
+                                    contentDescription = label
+                                )
+                            },
+                            label = {Text(text = label)},
+                            alwaysShowLabel = true
+                        )
+                    }
+                }
             },
             /*3.FloatingActionButton*/
             floatingActionButton = {
@@ -282,7 +287,7 @@ class  MainActivity : ComponentActivity() {
                         .padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "Contenido principal")
+                    Text(text = "Pantalla: ${items[selectedItem]}")
                 }
             }
         )
