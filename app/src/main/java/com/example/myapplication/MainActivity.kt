@@ -45,6 +45,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Favorite
@@ -68,6 +69,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -175,6 +177,9 @@ class  MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun ScaffoldScreen() {
+
+        var isExpanded by remember {mutableStateOf(true) }
+
         Scaffold(/*Estructura visual báscia con slots como topBar, bottomBar, FAB, etc*/
             /*1. topBar*/
             topBar = {
@@ -244,21 +249,29 @@ class  MainActivity : ComponentActivity() {
             },
             /*3.FloatingActionButton*/
             floatingActionButton = {
-                FloatingActionButton(
-                    onClick = {/*Acción que se ejecuta ala hacer clic en el botón*/},
+                ExtendedFloatingActionButton(
+                    onClick = {
+                        println("EFAB presinado")
+                        isExpanded = !isExpanded
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Send,
+                            contentDescription = "Enviar"
+                        )
+                    },
+                    text = {
+                        Text(text = "Enviar mensaje")
+                    },
+                    expanded = isExpanded,
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
-                    shape = CircleShape,
+                    shape = RoundedCornerShape(16.dp),
                     elevation = FloatingActionButtonDefaults.elevation(
                         defaultElevation = 6.dp,
                         pressedElevation = 12.dp
                     )
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Agregar"
-                    )
-                }
+                )
             },
 
             containerColor = MaterialTheme.colorScheme.primaryContainer,
