@@ -83,6 +83,8 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
@@ -156,6 +158,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import coil.request.Disposable
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import kotlinx.coroutines.delay
@@ -184,9 +187,13 @@ class  MainActivity : ComponentActivity() {
 
         var isExpanded by remember {mutableStateOf(true) }
 
-        val items = listOf("Inicio", "Buscar", "Perfil")
+        val items = listOf("Inicio", "Buscar", "Perfil", "Favoritos", "Ajustes")
 
-        val icons = listOf(Icons.Default.Home, Icons.Default.Search, Icons.Default.Person)
+        val icons = listOf(Icons.Default.Home,
+            Icons.Default.Search,
+            Icons.Default.Person,
+            Icons.Default.Favorite,
+            Icons.Default.Settings)
 
          var selectedItem by rememberSaveable { mutableIntStateOf(0) }
 
@@ -227,31 +234,6 @@ class  MainActivity : ComponentActivity() {
                     )
                 )
             },
-            /*2.bottomBar*/
-            bottomBar = {
-                NavigationBar(
-                    modifier = Modifier.fillMaxWidth(),
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    tonalElevation = 3.dp,
-                    windowInsets = NavigationBarDefaults.windowInsets
-                ) {
-                    items.forEachIndexed {index, label ->
-                        NavigationBarItem(
-                            onClick = {selectedItem = index},
-                            selected = selectedItem == index,
-                            icon = {
-                                Icon(
-                                    imageVector = icons[index],
-                                    contentDescription = label
-                                )
-                            },
-                            label = {Text(text = label)},
-                            alwaysShowLabel = true
-                        )
-                    }
-                }
-            },
             /*3.FloatingActionButton*/
             floatingActionButton = {
                 ExtendedFloatingActionButton(
@@ -280,14 +262,54 @@ class  MainActivity : ComponentActivity() {
             },
 
             containerColor = MaterialTheme.colorScheme.primaryContainer,
-            content = {paddingValues ->
-                Box(
+            content = { paddingValues ->
+                Row(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues),
-                    contentAlignment = Alignment.Center
+                        .padding(paddingValues)
                 ) {
-                    Text(text = "Pantalla: ${items[selectedItem]}")
+                    NavigationRail(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        header = {
+                            Image(
+                                //painter = painterResource(id = R.drawable.avatar),
+                                painter = rememberAsyncImagePainter("https://media.gq.com.mx/photos/66b3e2ab1eb4176c241add84/16:9/w_2992,h_1683,c_limit/Mejores_series_de_anime.jpg "),
+                                contentDescription = "Avatar del usuario",
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .size(48.dp)
+                                    .clip(CircleShape)
+                            )
+                        }
+                    ) {
+                        items.forEachIndexed { index, label ->
+                            NavigationRailItem(
+                                onClick = {selectedItem = index},
+                                selected = selectedItem == index,
+                                icon = {
+                                    Icon(
+                                        imageVector = icons[index],
+                                        contentDescription = label
+                                    )
+                                },
+                                label = {Text(text = label)},
+                                alwaysShowLabel = false,
+                                enabled = true
+                            )
+                        }
+                    }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Pantalla: ${items[selectedItem]}",
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+                    }
                 }
             }
         )
