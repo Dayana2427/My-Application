@@ -46,6 +46,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Favorite
@@ -56,6 +57,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Badge
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -66,6 +68,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
@@ -80,9 +83,13 @@ import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.OutlinedButton
@@ -108,6 +115,7 @@ import androidx.compose.material3.TimePickerLayoutType
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -176,145 +184,141 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                ScaffoldScreen()
+                NavigationDrawerExample()
             }
         }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun ScaffoldScreen() {
+    fun NavigationDrawerExample() {
 
-        var isExpanded by remember {mutableStateOf(true) }
+        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+        val scope = rememberCoroutineScope()
 
-        val items = listOf("Inicio", "Buscar", "Perfil", "Favoritos", "Ajustes")
+        val drawerItems = listOf("Inicio", "Perfil", "Ajustes")
+        val drawerIcons = listOf(Icons.Default.Home, Icons.Default.Person, Icons.Default.Settings)
 
-        val icons = listOf(Icons.Default.Home,
-            Icons.Default.Search,
-            Icons.Default.Person,
-            Icons.Default.Favorite,
-            Icons.Default.Settings)
+        var selectedItem  by remember {mutableIntStateOf(0) }
 
-         var selectedItem by rememberSaveable { mutableIntStateOf(0) }
-
-        Scaffold(/*Estructura visual báscia con slots como topBar, bottomBar, FAB, etc*/
-            /*1. topBar*/
-            topBar = {
-                CenterAlignedTopAppBar(
-                    title = {
-                        Text(text = "Mi aplicación")
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = {}) {
-                            Icon(
-                                imageVector = Icons.Default.Menu,
-                                contentDescription = "Menu"
-                            )
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = {}) {
-                            Icon(
-                                imageVector = Icons.Default.Notifications,
-                                contentDescription = "Notificaciones"
-                            )
-                        }
-                        IconButton(onClick = {}) {
-                            Icon(
-                                imageVector = Icons.Default.Settings,
-                                contentDescription = "Configuración"
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                        actionIconContentColor = MaterialTheme.colorScheme.onPrimary
-                    )
-                )
-            },
-            /*3.FloatingActionButton*/
-            floatingActionButton = {
-                ExtendedFloatingActionButton(
-                    onClick = {
-                        println("EFAB presinado")
-                        isExpanded = !isExpanded
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Send,
-                            contentDescription = "Enviar"
-                        )
-                    },
-                    text = {
-                        Text(text = "Enviar mensaje")
-                    },
-                    expanded = isExpanded,
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                    shape = RoundedCornerShape(16.dp),
-                    elevation = FloatingActionButtonDefaults.elevation(
-                        defaultElevation = 6.dp,
-                        pressedElevation = 12.dp
-                    )
-                )
-            },
-
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            content = { paddingValues ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                ) {
-                    NavigationRail(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        header = {
-                            Image(
-                                //painter = painterResource(id = R.drawable.avatar),
-                                painter = rememberAsyncImagePainter("https://media.gq.com.mx/photos/66b3e2ab1eb4176c241add84/16:9/w_2992,h_1683,c_limit/Mejores_series_de_anime.jpg "),
-                                contentDescription = "Avatar del usuario",
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .size(48.dp)
-                                    .clip(CircleShape)
-                            )
-                        }
-                    ) {
-                        items.forEachIndexed { index, label ->
-                            NavigationRailItem(
-                                onClick = {selectedItem = index},
-                                selected = selectedItem == index,
-                                icon = {
-                                    Icon(
-                                        imageVector = icons[index],
-                                        contentDescription = label
-                                    )
-                                },
-                                label = {Text(text = label)},
-                                alwaysShowLabel = false,
-                                enabled = true
-                            )
-                        }
-                    }
-                    Box(
+        ModalNavigationDrawer(
+            drawerContent = {
+                ModalDrawerSheet{
+                    Column(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(32.dp),
-                        contentAlignment = Alignment.Center
+                            .fillMaxWidth()
+                            .padding(16.dp)
                     ) {
+                        Icon(
+                            imageVector = Icons.Default.AccountCircle,
+                            contentDescription = "Foto de perfil",
+                            modifier = Modifier
+                                .size(72.dp)
+                                .clip(CircleShape),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+
                         Text(
-                            text = "Pantalla: ${items[selectedItem]}",
-                            style = MaterialTheme.typography.headlineSmall
+                            text = "Bienbenid@",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Text(
+                            text = "usuario@gmail.com",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    HorizontalDivider()
+
+                    Text(
+                        text = "Menu",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(16.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    drawerItems.forEachIndexed {index, item ->
+                        NavigationDrawerItem(
+                            onClick = {
+                                selectedItem = index
+
+                                scope.launch {
+                                    drawerState.close()
+                                }
+                            },
+                            selected = selectedItem == index,
+                            icon = {
+                                Icon(
+                                    drawerIcons[index],
+                                    contentDescription = item
+                                )
+                            },
+                            label = {Text(text = item)},
+                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                            badge = {
+                                if (index == 0) {
+                                    Badge {
+                                        Text(text = "3")
+                                    }
+                                }
+                            },
+                            shape = RoundedCornerShape(12.dp)
                         )
                     }
                 }
-            }
-        )
-    }
+            },
+            drawerState = drawerState,
+            gesturesEnabled = true
+        ) {
+            Scaffold(
+                topBar = {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                text = "Mi aplicación",
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                        },
+                        navigationIcon = {
+                            IconButton(onClick = {
+                                    scope.launch {
+                                        drawerState.open()
+                                    }
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Menu,
+                                    contentDescription = "Menu"
+                                )
+                            }
+                        },
+                        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    )
+                },
+                containerColor = MaterialTheme.colorScheme.surface
+            ) {paddingValues ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Sección: ${drawerItems[selectedItem]}"
+                    )
+                }
 
+            }
+        }
+    }
 
 
 
