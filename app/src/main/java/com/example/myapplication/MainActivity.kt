@@ -184,11 +184,51 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                NavigationDrawerExample()
+                PaddingScaffoldExample()
             }
         }
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun PaddingScaffoldExample() {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(text = "Ejemplo con y sin padding")
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                        actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                )
+            }
+        ) {padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Red)
+                    .padding(8.dp)
+            ) {
+                Text(text = "Sin padding", color = Color.White)
+                Text(text = "Este texto queda tapado por el AppBar", color = Color.White)
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Black)
+                    .padding(padding)
+                    .padding(64.dp)
+            ) {
+                Text(text = "Con padding del Scaffold", color = Color.White)
+                Text(text = "Este texto se ve bien debajo del AppBar", color = Color.White)
+            }
+        }
+    }
 
 
 
