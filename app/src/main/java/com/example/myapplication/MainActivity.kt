@@ -102,6 +102,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.SmallFloatingActionButton
@@ -190,93 +191,60 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                TabRowExample()
+                ScrollTabRowExample()
             }
         }
     }
 
     @Composable
-    fun TabRowExample() {
-        val tabTitles = listOf("Inicio", "Favoritos", "Perfil")
+    fun ScrollTabRowExample() {
+        val tabTitles = listOf("Incio", "Favoritos", "Perfil"," Configuarción", "Notificcaciones")
 
-        val tabIcons = listOf(
-            Icons.Default.Home,
-            Icons.Default.Favorite,
-            Icons.Default.Person
-        )
 
         var selectedTabIndex by remember { mutableIntStateOf(0) }
 
-        val interactionSource = remember {
-            List(tabTitles.size) {
-                MutableInteractionSource()
-            }
-        }
-
         Scaffold(
             topBar = {
-                TabRow(
+                ScrollableTabRow(
                     selectedTabIndex = selectedTabIndex,
                     modifier = Modifier.statusBarsPadding(),
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    indicator = {tabPosition ->
+                    edgePadding = 12.dp,
+                    indicator = {tabPositions ->
                         TabRowDefaults.SecondaryIndicator(
-                            modifier = Modifier
-                                .tabIndicatorOffset(tabPosition[selectedTabIndex])
-                                .height(3.dp),
+                            Modifier
+                                .tabIndicatorOffset(tabPositions[selectedTabIndex]),
                             color = MaterialTheme.colorScheme.primary
-                        )
-                    },
-                    divider = {
-                        HorizontalDivider(
-                            color = MaterialTheme.colorScheme.outlineVariant,
-                            thickness = 1.dp
                         )
                     }
                 ) {
                     tabTitles.forEachIndexed { index, title ->
-
-                        val enabled = index!=1
-
                         Tab(
                             selected = selectedTabIndex == index,
-                            onClick = {
-                                //selectedTabIndex = index
-                                if (enabled) selectedTabIndex = index|
-                            },
-                            modifier = Modifier.padding(horizontal = 4.dp),
-                            enabled = enabled,
+                            onClick = {selectedTabIndex = index},
                             text = {
                                 Text(
                                     text = title,
-                                    style = MaterialTheme.typography.titleLarge
+                                    style = MaterialTheme.typography.labelLarge
                                 )
-                            },
-                            icon = {
-                                Icon(
-                                    imageVector = tabIcons[index],
-                                    contentDescription = title
-                                )
-                            },
-                           selectedContentColor = MaterialTheme.colorScheme.primary,
-                            unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            interactionSource = interactionSource[index]
-                        )
+                            }
+                        ) 
                     }
                 }
             }
-        ) {paddingValues ->
+        ) {
+            paddingValues ->
             Column(
                 modifier = Modifier
                     .padding(paddingValues)
                     .padding(16.dp)
             ) {
-                when(selectedTabIndex){
-                    0 -> Text("Pantalla de Inicio", style = MaterialTheme.typography.bodyLarge)
-                    1 -> Text("Pantalla de Favoritos", style = MaterialTheme.typography.bodyLarge)
-                    2 -> Text("Pantalla de Perfil", style = MaterialTheme.typography.bodyLarge)
-                }
+                Text(
+                    text = "Pestaña: ${tabTitles[selectedTabIndex]}",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontSize = 16.sp
+                )
             }
         }
     }
