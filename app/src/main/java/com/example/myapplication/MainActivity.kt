@@ -21,6 +21,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.snapping.SnapPosition
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -105,6 +107,10 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -184,51 +190,98 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                PaddingScaffoldExample()
+                TabRowExample()
             }
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun PaddingScaffoldExample() {
+    fun TabRowExample() {
+        val tabTitles = listOf("Inicio", "Favoritos", "Perfil")
+
+        val tabIcons = listOf(
+            Icons.Default.Home,
+            Icons.Default.Favorite,
+            Icons.Default.Person
+        )
+
+        var selectedTabIndex by remember { mutableIntStateOf(0) }
+
+        val interactionSource = remember {
+            List(tabTitles.size) {
+                MutableInteractionSource()
+            }
+        }
+
         Scaffold(
             topBar = {
-                TopAppBar(
-                    title = {
-                        Text(text = "Ejemplo con y sin padding")
+                TabRow(
+                    selectedTabIndex = selectedTabIndex,
+                    modifier = Modifier.statusBarsPadding(),
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    indicator = {tabPosition ->
+                        TabRowDefaults.SecondaryIndicator(
+                            modifier = Modifier
+                                .tabIndicatorOffset(tabPosition[selectedTabIndex])
+                                .height(3.dp),
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                        actionIconContentColor = MaterialTheme.colorScheme.onPrimary
-                    )
-                )
-            }
-        ) {padding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Red)
-                    .padding(8.dp)
-            ) {
-                Text(text = "Sin padding", color = Color.White)
-                Text(text = "Este texto queda tapado por el AppBar", color = Color.White)
-            }
+                    divider = {
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.outlineVariant,
+                            thickness = 1.dp
+                        )
+                    }
+                ) {
+                    tabTitles.forEachIndexed { index, title ->
 
+                        val enabled = index!=1
+
+                        Tab(
+                            selected = selectedTabIndex == index,
+                            onClick = {
+                                //selectedTabIndex = index
+                                if (enabled) selectedTabIndex = index|
+                            },
+                            modifier = Modifier.padding(horizontal = 4.dp),
+                            enabled = enabled,
+                            text = {
+                                Text(
+                                    text = title,
+                                    style = MaterialTheme.typography.titleLarge
+                                )
+                            },
+                            icon = {
+                                Icon(
+                                    imageVector = tabIcons[index],
+                                    contentDescription = title
+                                )
+                            },
+                           selectedContentColor = MaterialTheme.colorScheme.primary,
+                            unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            interactionSource = interactionSource[index]
+                        )
+                    }
+                }
+            }
+        ) {paddingValues ->
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Black)
-                    .padding(padding)
-                    .padding(64.dp)
+                    .padding(paddingValues)
+                    .padding(16.dp)
             ) {
-                Text(text = "Con padding del Scaffold", color = Color.White)
-                Text(text = "Este texto se ve bien debajo del AppBar", color = Color.White)
+                when(selectedTabIndex){
+                    0 -> Text("Pantalla de Inicio", style = MaterialTheme.typography.bodyLarge)
+                    1 -> Text("Pantalla de Favoritos", style = MaterialTheme.typography.bodyLarge)
+                    2 -> Text("Pantalla de Perfil", style = MaterialTheme.typography.bodyLarge)
+                }
             }
         }
     }
+
+
 
 
 
