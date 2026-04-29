@@ -191,63 +191,13 @@ class  MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                ScrollTabRowExample()
+                MyApp()
             }
         }
     }
 
-    @Composable
-    fun ScrollTabRowExample() {
-        val tabTitles = listOf("Incio", "Favoritos", "Perfil"," Configuarción", "Notificcaciones")
 
 
-        var selectedTabIndex by remember { mutableIntStateOf(0) }
-
-        Scaffold(
-            topBar = {
-                ScrollableTabRow(
-                    selectedTabIndex = selectedTabIndex,
-                    modifier = Modifier.statusBarsPadding(),
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    edgePadding = 12.dp,
-                    indicator = {tabPositions ->
-                        TabRowDefaults.SecondaryIndicator(
-                            Modifier
-                                .tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                ) {
-                    tabTitles.forEachIndexed { index, title ->
-                        Tab(
-                            selected = selectedTabIndex == index,
-                            onClick = {selectedTabIndex = index},
-                            text = {
-                                Text(
-                                    text = title,
-                                    style = MaterialTheme.typography.labelLarge
-                                )
-                            }
-                        ) 
-                    }
-                }
-            }
-        ) {
-            paddingValues ->
-            Column(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = "Pestaña: ${tabTitles[selectedTabIndex]}",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontSize = 16.sp
-                )
-            }
-        }
-    }
 
 
 

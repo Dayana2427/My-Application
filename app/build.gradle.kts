@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.constraintLayout)
     implementation(libs.coil)
+    implementation(libs.navController)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
